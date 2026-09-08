@@ -33,7 +33,7 @@ pipeline {
 
     parameters {
         string(name: 'MR_ID', defaultValue: '', description: 'Merge request ID (optional, for traceability)')
-        string(name: 'GIT_REF', defaultValue: 'develop', description: 'Branch or ref to build')
+        string(name: 'GIT_REF', defaultValue: 'main', description: 'Branch or ref to build')
         string(name: 'TEST_MARKERS', defaultValue: 'regression,security', description: 'Comma-separated pytest markers to run (allowed: regression, security)')
         string(name: 'NOTIFY_EMAIL', defaultValue: '', description: 'Distribution list to email on failure (leave empty to disable)')
     }
@@ -69,8 +69,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: params.GIT_REF,
-                    url: 'git@gitlab.dom.tti:geniatesting/LLMTester.git',
-                    credentialsId: 'gitlab-ssh-credentials'
+                    url: 'https://github.com/OmarMeejri/LLMTester',
+                    credentialsId: 'github-creds'
             }
         }
 
@@ -83,14 +83,14 @@ pipeline {
                     pip install -r requirements.txt
                     pip install pytest-xdist pytest-cov ruff
                 '''
-                // Stash the venv so parallel shards can restore it without reinstalling
-                stash includes: '.venv/**', name: 'venv'
+                // No stash/unstash: the whole pipeline runs on one `agent any` workspace,
+                // so .venv is already on disk for every later stage. Stashing it tripped
+                // Jenkins' tar-symlink guard on venv's lib64 -> lib symlink.
             }
         }
 
         stage('Lint') {
             steps {
-                unstash 'venv'
                 sh '''
                     . .venv/bin/activate
                     ruff check --select=E9,F .
@@ -108,7 +108,6 @@ pipeline {
                         expression { env.VALIDATED_MARKERS.split(',').contains('regression') }
                     }
                     steps {
-                        unstash 'venv'
                         sh '''
                             . .venv/bin/activate
                             pytest -m regression -n auto --cov=. --cov-report=xml:coverage-regression.xml --junitxml=results-regression.xml
@@ -120,7 +119,6 @@ pipeline {
                         expression { env.VALIDATED_MARKERS.split(',').contains('security') }
                     }
                     steps {
-                        unstash 'venv'
                         sh '''
                             . .venv/bin/activate
                             pytest -m security -n auto --cov=. --cov-report=xml:coverage-security.xml --junitxml=results-security.xml
