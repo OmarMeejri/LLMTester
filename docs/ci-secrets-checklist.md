@@ -2,7 +2,7 @@
 
 Required setup in **Jenkins → Manage Jenkins → Manage Credentials** before the pipeline can run successfully.
 
-- [ ] **`gitlab-ssh-credentials`** — SSH key credential with access to `git@gitlab.dom.tti:geniatesting/LLMTester.git`. Used by the `Checkout` stage. **Not yet confirmed to exist — create/verify before first run.**
+- [ ] **`github-creds`** — GitHub credential (username + personal access token, or GitHub App token) with access to `https://github.com/OmarMeejri/LLMTester.git`. Used by the `Checkout` stage. **Not yet confirmed to exist — create/verify before first run.**
 - [ ] **Mail server configured** (Manage Jenkins → System → Extended E-mail Notification / built-in Mailer) — required for the `post.failure` `mail` step to actually send. No secret is stored in the pipeline itself; the SMTP config lives in Jenkins system settings.
 - [ ] **`NOTIFY_EMAIL`** build parameter — not a secret, but must be set (job default or per-run) to an actual distribution list for failure notifications to go anywhere. **Currently defaults to empty (disabled) — user must supply the address.**
 
@@ -19,5 +19,5 @@ Required setup in **Jenkins → Manage Jenkins → Manage Credentials** before t
 
 ## Notes
 
-- No credentials or secrets are hardcoded in the Jenkinsfile — the SSH credential is referenced only by its Jenkins credential ID (`gitlab-ssh-credentials`).
+- No credentials or secrets are hardcoded in the Jenkinsfile — the GitHub credential is referenced only by its Jenkins credential ID (`github-creds`).
 - `NOTIFY_EMAIL` is a plain build parameter, not a secret — it's just an email address.

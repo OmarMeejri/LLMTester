@@ -69,7 +69,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: params.GIT_REF,
-                    url: 'https://github.com/OmarMeejri/LLMTester',
+                    url: 'https://github.com/OmarMeejri/LLMTester.git',
                     credentialsId: 'github-creds'
             }
         }

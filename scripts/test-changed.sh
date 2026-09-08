@@ -1,9 +1,9 @@
 #!/bin/bash
-# Runs pytest only on test files changed vs the base branch (default: origin/develop).
+# Runs pytest only on test files changed vs the base branch (default: origin/main).
 # Falls back to the full suite if no test files changed or diff fails.
 set -euo pipefail
 
-BASE_REF="${1:-origin/develop}"
+BASE_REF="${1:-origin/main}"
 
 # shellcheck disable=SC1091
 . .venv/bin/activate 2>/dev/null || true
